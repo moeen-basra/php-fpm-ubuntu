@@ -9,8 +9,13 @@ ADD https://github.com/mlocati/docker-php-extension-installer/releases/latest/do
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    nginx nano vim bash-completion zlib1g-dev librabbitmq-dev libpq-dev \
-    libmemcached-dev libmemcached11 postgresql-client git unzip zip supervisor && \
+    lsb-release wget gnupg nginx nano vim bash-completion zlib1g-dev librabbitmq-dev libpq-dev \
+    libmemcached-dev libmemcached11 git unzip zip supervisor && \
+    # add postgresql repository
+    wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | gpg --dearmor -o /etc/apt/trusted.gpg.d/postgresql.gpg && \
+    echo "deb http://apt.postgresql.org/pub/repos/apt/ $(. /etc/os-release && echo $VERSION_CODENAME)-pgdg main" > /etc/apt/sources.list.d/pgdg.list && \
+    # update and install postgresql-16 client
+    apt-get update && apt-get install -y postgresql-client-16 && \
     # node
     curl -sL https://deb.nodesource.com/setup_$NODE_VERSION | bash - && \
     apt-get install -y nodejs && npm install npm@$NPM_VERSION -g && \
